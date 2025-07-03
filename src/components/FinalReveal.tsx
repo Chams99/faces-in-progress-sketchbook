@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { LazyImage } from './ui/lazy-image';
 
 const FinalReveal = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -214,10 +215,11 @@ const FinalReveal = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-20"></div>
                   
                   {/* The actual birthday image */}
-                  <img 
+                  <LazyImage 
                     src="/images/Last.jpg" 
                     alt="Birthday Surprise!" 
-                    className="w-full h-full object-cover relative z-10 animate-rainbow"
+                    className="relative z-10 animate-rainbow"
+                    showSkeleton={false}
                   />
                   
                   {/* Glowing border effect */}

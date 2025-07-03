@@ -1,13 +1,21 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import SketchEntry from './SketchEntry';
+import SketchTimelineSkeleton from './SketchTimelineSkeleton';
 import { sketches } from '../data/sketchData';
+import { useLoading } from '../hooks/use-loading';
 
 const SketchTimeline = () => {
   const [visibleSketches, setVisibleSketches] = useState<number[]>([]);
+  const { isLoading } = useLoading({
+    initialDelay: 1000,
+    minLoadingTime: 1500
+  });
   const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isLoading) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -24,7 +32,11 @@ const SketchTimeline = () => {
     sketchElements.forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <SketchTimelineSkeleton />;
+  }
 
   return (
     <section className="py-20 px-6 relative" ref={timelineRef}>

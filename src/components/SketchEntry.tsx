@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { LazyImage } from './ui/lazy-image';
 
 interface Sketch {
   title: string;
@@ -25,11 +26,16 @@ const SketchEntry = ({ sketch, index, isVisible, isEven }: SketchEntryProps) => 
     >
       {/* Image */}
       <div className="flex-1 relative">
-        <div className="aspect-[3/4] bg-white rounded-lg shadow-lg overflow-hidden border border-stone-200">
-          <img 
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-stone-200">
+          <LazyImage 
             src={sketch.imageUrl} 
             alt={sketch.title}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            className="transition-transform duration-500 hover:scale-105"
+            containerClassName="rounded-lg"
+            skeletonClassName="bg-stone-200"
+            showSkeleton={true}
+            showSpinner={false}
+            loadingText="Loading sketch..."
           />
         </div>
         
