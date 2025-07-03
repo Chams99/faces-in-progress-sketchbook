@@ -1,6 +1,4 @@
-
 import React from 'react';
-import { Download } from 'lucide-react';
 
 const OutroSection = () => {
   return (
@@ -11,11 +9,6 @@ const OutroSection = () => {
           But this last one was something more. So if you're seeing this: thank you, and I hope 
           it means something to you too."
         </p>
-        
-        <button className="inline-flex items-center gap-3 bg-stone-800 text-white px-6 py-3 rounded-lg hover:bg-stone-700 transition-colors duration-300 mb-8">
-          <Download className="w-5 h-5" />
-          Download the Sketchbook (PDF)
-        </button>
         
         <footer className="text-sm text-stone-500 border-t border-stone-200 pt-8">
           All drawings created using only pencil, eraser, and black pen.
