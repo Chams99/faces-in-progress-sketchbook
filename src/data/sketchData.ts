@@ -1,81 +1,80 @@
-
 export const sketches = [
   {
-    title: "Sketch 1 – First Attempt",
+    title: "Sketch 1 – Anime Drift",
     medium: "Pencil",
-    reflection: "Starting with basics. The proportions are completely off, but that's the point.",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=600&fit=crop"
+    reflection: "Tried to channel some anime inspiration — ended up somewhere in between realism and stylized. A shaky but fun start.",
+    imageUrl: "/images/img5.jpg"
   },
   {
-    title: "Sketch 2 – Structure Focus",
+    title: "Sketch 2 – Tutorial Trial",
     medium: "Pencil",
-    reflection: "Trying to understand facial structure. Still struggling with the eyes.",
-    imageUrl: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=600&fit=crop"
+    reflection: "Followed a tutorial for this one. It helped a bit, but made me realize how much I still struggle with the basics.",
+    imageUrl: "/images/img3.jpg"
   },
   {
-    title: "Sketch 3 – Pen Only",
+    title: "Sketch 3 – Slimmer by Mistake",
     medium: "Black Pen",
-    reflection: "No eraser this time. Every line had to count. Terrifying and liberating.",
-    imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=600&fit=crop"
+    reflection: "Drew an overweight character, but my proportions were so off I accidentally made them look way slimmer. Big lesson in observation.",
+    imageUrl: "/images/img7.jpg"
   },
   {
-    title: "Sketch 4 – Side Profile",
+    title: "Sketch 4 – Overworked",
     medium: "Pencil",
-    reflection: "Profiles felt easier until I realized I was drawing them all the same way.",
-    imageUrl: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=600&fit=crop"
+    reflection: "Erased so much the paper started to wear out. Learned when to stop pushing and start fresh.",
+    imageUrl: "/images/img8.jpg"
   },
   {
-    title: "Sketch 5 – Quick Study",
+    title: "Sketch 5 – Off the Top",
     medium: "Pencil",
-    reflection: "Five-minute limit. Forced me to focus on the most important features first.",
-    imageUrl: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=600&fit=crop"
+    reflection: "Tried drawing this one from imagination — especially tough on the angle. Definitely stretched my brain.",
+    imageUrl: "/images/img4.jpg"
   },
   {
-    title: "Sketch 6 – Expression Practice",
+    title: "Sketch 6 – Nose Problems",
     medium: "Black Pen",
-    reflection: "Tried to capture something beyond just features. Still not there yet.",
-    imageUrl: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?w=400&h=600&fit=crop"
+    reflection: "The nose and ears really threw me off. It's where I started noticing how tricky facial features actually are.",
+    imageUrl: "/images/img6.jpg"
   },
   {
-    title: "Sketch 7 – From Memory",
+    title: "Sketch 7 – Pen First, Regret Later",
     medium: "Pencil",
-    reflection: "Drew without reference. Realized how much I rely on copying rather than understanding.",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=600&fit=crop"
+    reflection: "Went in directly with a black pen, no pencil. It was supposed to be a girl… let's just say it didn't quite land.",
+    imageUrl: "/images/img11.jpg"
   },
   {
-    title: "Sketch 8 – Construction Lines",
+    title: "Sketch 8 – Wait… Was That Good?",
     medium: "Pencil",
-    reflection: "Left all the construction lines visible. Sometimes the process is more interesting than the result.",
-    imageUrl: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=600&fit=crop"
+    reflection: "Had a small realization: maybe I'm actually getting better at proportions. This one felt like progress.",
+    imageUrl: "/images/img13.jpg"
   },
   {
-    title: "Sketch 9 – Minimal Lines",
+    title: "Sketch 9 – Look Away",
     medium: "Black Pen",
-    reflection: "How few lines can I use and still suggest a face? Less turned out to be more.",
-    imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=600&fit=crop"
+    reflection: "Discovered I kind of enjoy drawing side profiles that look away — they feel easier to balance and shape.",
+    imageUrl: "/images/img9.jpg"
   },
   {
-    title: "Sketch 10 – Different Angle",
+    title: "Sketch 10 – Front-Face Fight",
     medium: "Pencil",
-    reflection: "Three-quarter view. Finally starting to see improvement in my proportions.",
-    imageUrl: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=600&fit=crop"
+    reflection: "Still not great with straight-on views. This one frustrated me more than most, but I stuck with it.",
+    imageUrl: "/images/img12.jpg"
   },
   {
-    title: "Sketch 11 – Age Study",
+    title: "Sketch 11 – Memory Test",
     medium: "Pencil",
-    reflection: "Tried drawing someone older. Wrinkles are harder than I thought.",
-    imageUrl: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=600&fit=crop"
+    reflection: "Drew this one fully from memory — tough, but surprisingly solid. A confidence booster.",
+    imageUrl: "/images/img10.jpg"
   },
   {
-    title: "Sketch 12 – Confident Lines",
+    title: "Sketch 12 – Ears & Noses Strike Back",
     medium: "Black Pen",
-    reflection: "Felt more sure of myself. The hesitation in my lines is finally disappearing.",
-    imageUrl: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?w=400&h=600&fit=crop"
+    reflection: "Another reminder that noses and ears are not my friends (yet).",
+    imageUrl: "/images/img1.jpg"
   },
   {
-    title: "Sketch 13 – Almost There",
+    title: "Sketch 13 – Beyond Anime",
     medium: "Pencil",
-    reflection: "This one felt different. Like I finally understood something I'd been missing.",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=600&fit=crop"
+    reflection: "Not a perfect sketch, but I started to understand how different realistic drawing is from anime. Big mindset shift here.And honestly don't like this as my last sketch.",
+    imageUrl: "/images/img2.jpg"
   }
 ];
