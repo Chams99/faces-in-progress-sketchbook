@@ -199,48 +199,85 @@ const FinalReveal = () => {
             🎉 SURPRISE! 🎉
           </h2>
           
-          {/* 3D Animated Final Portrait */}
+          {/* 3D Animated Final Portraits */}
           <div className="relative mb-12">
             <div className={`transition-all duration-2000 ease-out ${
               showImage ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 rotate-12'
             }`}>
-              <div className={`aspect-[3/4] max-w-2xl mx-auto relative ${
+              <div className={`max-w-4xl mx-auto relative ${
                 show3DEffect && !stopJumping ? 'animate-bounce' : ''
               }`}>
                 {/* 3D Shadow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl transform rotate-6 scale-105 opacity-30 blur-lg"></div>
                 
-                {/* Main image container with 3D effects */}
-                <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform hover:scale-105 transition-all duration-500 hover:rotate-1 animate-glow">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-20"></div>
-                  
-                  {/* The actual birthday image */}
-                  <LazyImage 
-                    src="/images/Last.jpg" 
-                    alt="Birthday Surprise!" 
-                    className="relative z-10 animate-rainbow"
-                    showSkeleton={false}
-                  />
-                  
-                  {/* Glowing border effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-30 transition-opacity duration-500"></div>
-                  
-                  {/* Sparkle overlay */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {[...Array(8)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute text-2xl animate-sparkle"
-                        style={{
-                          left: `${Math.random() * 100}%`,
-                          top: `${Math.random() * 100}%`,
-                          animationDelay: `${Math.random() * 2}s`,
-                          animationDuration: `${2 + Math.random() * 2}s`
-                        }}
-                      >
-                        ✨
-                      </div>
-                    ))}
+                {/* Two images side by side */}
+                <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
+                  {/* First image container */}
+                  <div className="relative w-96 aspect-[3/4] bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform transition-all duration-500 hover:rotate-1 animate-glow hover:scale-110">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-20"></div>
+                    
+                    {/* The first birthday image */}
+                    <LazyImage 
+                      src="/images/last.jpg" 
+                      alt="Birthday Surprise - Last!" 
+                      className="relative z-10 animate-rainbow object-cover w-full h-full"
+                      showSkeleton={false}
+                    />
+                    
+                    {/* Glowing border effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-30 transition-opacity duration-500"></div>
+                    
+                    {/* Sparkle overlay */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(4)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute text-2xl animate-sparkle"
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 2}s`,
+                            animationDuration: `${2 + Math.random() * 2}s`
+                          }}
+                        >
+                          ✨
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Second image container */}
+                  <div className="relative w-96 aspect-[3/4] bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform transition-all duration-500 hover:rotate-1 animate-glow hover:scale-110">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-20"></div>
+                    
+                    {/* The second birthday image */}
+                    <LazyImage 
+                      src="/images/Las.jpg" 
+                      alt="Birthday Surprise - Als!" 
+                      className="relative z-10 animate-rainbow object-cover w-full h-full"
+                      showSkeleton={false}
+                    />
+                    
+                    {/* Glowing border effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-30 transition-opacity duration-500"></div>
+                    
+                    {/* Sparkle overlay */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(4)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute text-2xl animate-sparkle"
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 2}s`,
+                            animationDuration: `${2 + Math.random() * 2}s`
+                          }}
+                        >
+                          ✨
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 
