@@ -25,13 +25,8 @@ const FinalReveal = () => {
 
   // Mobile-friendly audio play function
   const playAudio = async () => {
-    if (audioRef.current) {
+    if (audioRef.current && !audioPlayed) {
       try {
-        // Reset audio to beginning for mobile
-        if (isMobile) {
-          audioRef.current.currentTime = 0;
-        }
-        
         // For mobile, we need to handle audio differently
         if (isMobile) {
           // Try to play with user interaction
@@ -39,22 +34,10 @@ const FinalReveal = () => {
           if (playPromise !== undefined) {
             await playPromise;
             setAudioPlayed(true);
-            setAudioFailed(false);
-            
-            // Reset audio state after it finishes playing
-            audioRef.current.addEventListener('ended', () => {
-              setAudioPlayed(false);
-            }, { once: true });
           }
         } else {
           await audioRef.current.play();
           setAudioPlayed(true);
-          setAudioFailed(false);
-          
-          // Reset audio state after it finishes playing
-          audioRef.current.addEventListener('ended', () => {
-            setAudioPlayed(false);
-          }, { once: true });
         }
       } catch (e) {
         console.log('Audio play failed:', e);
@@ -472,23 +455,7 @@ const FinalReveal = () => {
         </div>
       )}
 
-      {/* Mobile audio trigger button - always visible when sound effect is active */}
-      {showSoundEffect && isMobile && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-          <button
-            onClick={playAudio}
-            className={`px-6 py-3 rounded-full shadow-lg animate-pulse border-2 border-white transition-all duration-300 ${
-              audioPlayed && !audioFailed 
-                ? 'bg-green-500 text-white' 
-                : audioFailed 
-                ? 'bg-yellow-500 text-white' 
-                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-            }`}
-          >
-            {audioPlayed && !audioFailed ? '🎵 Playing...' : '🎵 Tap to Play Music'}
-          </button>
-        </div>
-      )}
+
 
       {/* Hidden audio element for birthday sound */}
       <audio ref={audioRef} preload="auto">
