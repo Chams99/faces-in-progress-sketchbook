@@ -8,8 +8,11 @@ const FinalReveal = () => {
   const [showImage, setShowImage] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [show3DEffect, setShow3DEffect] = useState(false);
+  const [hide3DEffect, setHide3DEffect] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
+  const [hideParticles, setHideParticles] = useState(false);
   const [showSoundEffect, setShowSoundEffect] = useState(false);
+  const [hideSoundEffect, setHideSoundEffect] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [stopJumping, setStopJumping] = useState(false);
@@ -22,8 +25,13 @@ const FinalReveal = () => {
 
   // Mobile-friendly audio play function
   const playAudio = async () => {
-    if (audioRef.current && !audioPlayed) {
+    if (audioRef.current) {
       try {
+        // Reset audio to beginning for mobile
+        if (isMobile) {
+          audioRef.current.currentTime = 0;
+        }
+        
         // For mobile, we need to handle audio differently
         if (isMobile) {
           // Try to play with user interaction
@@ -31,10 +39,22 @@ const FinalReveal = () => {
           if (playPromise !== undefined) {
             await playPromise;
             setAudioPlayed(true);
+            setAudioFailed(false);
+            
+            // Reset audio state after it finishes playing
+            audioRef.current.addEventListener('ended', () => {
+              setAudioPlayed(false);
+            }, { once: true });
           }
         } else {
           await audioRef.current.play();
           setAudioPlayed(true);
+          setAudioFailed(false);
+          
+          // Reset audio state after it finishes playing
+          audioRef.current.addEventListener('ended', () => {
+            setAudioPlayed(false);
+          }, { once: true });
         }
       } catch (e) {
         console.log('Audio play failed:', e);
@@ -61,12 +81,29 @@ const FinalReveal = () => {
           setTimeout(() => setShowSecondLine(true), 2000);
           setTimeout(() => setShowImage(true), 4000);
           setTimeout(() => setShowConfetti(true), 4500);
-          setTimeout(() => setShow3DEffect(true), 5000);
-          setTimeout(() => setShowParticles(true), 5500);
+          setTimeout(() => {
+            setShow3DEffect(true);
+            // Hide 3D effect after 4 seconds
+            setTimeout(() => {
+              setHide3DEffect(true);
+            }, 4000);
+          }, 5000);
+          setTimeout(() => {
+            setShowParticles(true);
+            // Hide particles after 5 seconds
+            setTimeout(() => {
+              setHideParticles(true);
+            }, 5000);
+          }, 5500);
           setTimeout(() => {
             setShowSoundEffect(true);
             // Play birthday sound with mobile considerations
             playAudio();
+            
+            // Hide sound effect after 3 seconds
+            setTimeout(() => {
+              setHideSoundEffect(true);
+            }, 3000);
           }, 6000);
           
           // Stop jumping after 2 seconds
@@ -236,8 +273,8 @@ const FinalReveal = () => {
         zIndex: isLocked ? 9999 : 1
       }}
     >
-      {/* Animated background particles - reduced on mobile */}
-      {showParticles && (
+      {/* Animated background particles - appears for 5 seconds then disappears */}
+      {showParticles && !hideParticles && (
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(isMobile ? 10 : 20)].map((_, i) => (
             <div
@@ -351,8 +388,8 @@ const FinalReveal = () => {
                   </div>
                 </div>
                 
-                {/* Floating celebration elements - reduced on mobile */}
-                {show3DEffect && (
+                {/* Floating celebration elements - appears for 4 seconds then disappears */}
+                {show3DEffect && !hide3DEffect && (
                   <>
                     <div className="absolute -top-4 -right-4 text-4xl animate-float" style={{ animationDelay: '0.5s' }}>
                       🎂
@@ -406,8 +443,8 @@ const FinalReveal = () => {
         </div>
       </div>
 
-      {/* Floating hearts background - reduced on mobile */}
-      {showParticles && (
+      {/* Floating hearts background - appears for 5 seconds then disappears */}
+      {showParticles && !hideParticles && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(isMobile ? 8 : 15)].map((_, i) => (
             <div
@@ -426,8 +463,8 @@ const FinalReveal = () => {
         </div>
       )}
 
-      {/* Interactive click effect */}
-      {showSoundEffect && (
+      {/* Interactive click effect - appears for 3 seconds then disappears */}
+      {showSoundEffect && !hideSoundEffect && (
         <div className="fixed inset-0 pointer-events-none z-40">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-sparkle">
             🎵
@@ -435,24 +472,21 @@ const FinalReveal = () => {
         </div>
       )}
 
-      {/* Mobile audio trigger button */}
-      {showSoundEffect && isMobile && !audioPlayed && !audioFailed && (
+      {/* Mobile audio trigger button - always visible when sound effect is active */}
+      {showSoundEffect && isMobile && (
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
           <button
             onClick={playAudio}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full shadow-lg animate-pulse border-2 border-white"
+            className={`px-6 py-3 rounded-full shadow-lg animate-pulse border-2 border-white transition-all duration-300 ${
+              audioPlayed && !audioFailed 
+                ? 'bg-green-500 text-white' 
+                : audioFailed 
+                ? 'bg-yellow-500 text-white' 
+                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+            }`}
           >
-            🎵 Tap to Play Music
+            {audioPlayed && !audioFailed ? '🎵 Playing...' : '🎵 Tap to Play Music'}
           </button>
-        </div>
-      )}
-
-      {/* Audio failed message */}
-      {showSoundEffect && isMobile && audioFailed && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-yellow-500 text-white px-6 py-3 rounded-full shadow-lg border-2 border-white">
-            🎵 Music available on tap!
-          </div>
         </div>
       )}
 
