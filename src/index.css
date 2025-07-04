@@ -178,3 +178,41 @@ All colors MUST be HSL.
 .animate-shimmer {
   animation: shimmer 1.5s infinite;
 }
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Reduce animation complexity on mobile for better performance */
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  .animate-sparkle {
+    animation: sparkle 3s ease-in-out infinite;
+  }
+  
+  .animate-rainbow {
+    animation: rainbow 4s linear infinite;
+  }
+  
+  .animate-shake {
+    animation: shake 0.8s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite;
+  }
+  
+  /* Optimize canvas rendering on mobile */
+  canvas {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Improve touch responsiveness */
+  button, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}

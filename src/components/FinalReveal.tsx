@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { LazyImage } from './ui/lazy-image';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const FinalReveal = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -12,9 +13,37 @@ const FinalReveal = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [stopJumping, setStopJumping] = useState(false);
+  const [audioPlayed, setAudioPlayed] = useState(false);
+  const [audioFailed, setAudioFailed] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const isMobile = useIsMobile();
+
+  // Mobile-friendly audio play function
+  const playAudio = async () => {
+    if (audioRef.current && !audioPlayed) {
+      try {
+        // For mobile, we need to handle audio differently
+        if (isMobile) {
+          // Try to play with user interaction
+          const playPromise = audioRef.current.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            setAudioPlayed(true);
+          }
+        } else {
+          await audioRef.current.play();
+          setAudioPlayed(true);
+        }
+      } catch (e) {
+        console.log('Audio play failed:', e);
+        // On mobile, audio might fail due to autoplay restrictions
+        // This is normal and expected
+        setAudioFailed(true);
+      }
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,8 +53,10 @@ const FinalReveal = () => {
           setIsVisible(true);
           setIsLocked(true); // Lock scrolling when section comes into view
           
-          // Prevent scrolling
-          document.body.style.overflow = 'hidden';
+          // Prevent scrolling - but be more careful on mobile
+          if (!isMobile) {
+            document.body.style.overflow = 'hidden';
+          }
           
           setTimeout(() => setShowSecondLine(true), 2000);
           setTimeout(() => setShowImage(true), 4000);
@@ -34,10 +65,8 @@ const FinalReveal = () => {
           setTimeout(() => setShowParticles(true), 5500);
           setTimeout(() => {
             setShowSoundEffect(true);
-            // Play birthday sound
-            if (audioRef.current) {
-              audioRef.current.play().catch(e => console.log('Audio play failed:', e));
-            }
+            // Play birthday sound with mobile considerations
+            playAudio();
           }, 6000);
           
           // Stop jumping after 2 seconds
@@ -46,11 +75,13 @@ const FinalReveal = () => {
           // Unlock scrolling after all animations complete
           setTimeout(() => {
             setIsLocked(false);
-            document.body.style.overflow = 'auto';
+            if (!isMobile) {
+              document.body.style.overflow = 'auto';
+            }
           }, 8000);
         }
       },
-      { threshold: 0.5 }
+      { threshold: isMobile ? 0.3 : 0.5 } // Lower threshold for mobile
     );
 
     if (sectionRef.current) {
@@ -60,24 +91,54 @@ const FinalReveal = () => {
     return () => {
       observer.disconnect();
       // Clean up body overflow
-      document.body.style.overflow = 'auto';
+      if (!isMobile) {
+        document.body.style.overflow = 'auto';
+      }
     };
-  }, [hasTriggered]);
+  }, [hasTriggered, isMobile]);
 
   // Keyboard escape handler
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isLocked) {
         setIsLocked(false);
-        document.body.style.overflow = 'auto';
+        if (!isMobile) {
+          document.body.style.overflow = 'auto';
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [isLocked]);
+  }, [isLocked, isMobile]);
 
-  // Confetti animation
+  // Touch event handler for mobile
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleTouchStart = (event: TouchEvent) => {
+      // Allow touch interaction to trigger audio on mobile
+      if (showSoundEffect && !audioPlayed) {
+        playAudio();
+      }
+    };
+
+    const handleClick = (event: MouseEvent) => {
+      // Also handle click events for mobile
+      if (showSoundEffect && !audioPlayed) {
+        playAudio();
+      }
+    };
+
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('click', handleClick);
+    };
+  }, [showSoundEffect, audioPlayed, isMobile]);
+
+  // Confetti animation with mobile optimizations
   useEffect(() => {
     if (!showConfetti || !canvasRef.current) return;
 
@@ -85,8 +146,16 @@ const FinalReveal = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Use device pixel ratio for better mobile performance
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    
+    ctx.scale(dpr, dpr);
 
     const confetti = [];
     const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
@@ -102,7 +171,7 @@ const FinalReveal = () => {
       spin: number;
 
       constructor() {
-        this.x = Math.random() * canvas.width;
+        this.x = Math.random() * rect.width;
         this.y = -10;
         this.w = Math.random() * 10 + 5;
         this.h = Math.random() * 10 + 5;
@@ -128,19 +197,20 @@ const FinalReveal = () => {
       }
     }
 
-    // Create confetti pieces
-    for (let i = 0; i < 100; i++) {
+    // Reduce confetti count on mobile for better performance
+    const confettiCount = isMobile ? 50 : 100;
+    for (let i = 0; i < confettiCount; i++) {
       confetti.push(new ConfettiPiece());
     }
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, rect.width, rect.height);
       
       confetti.forEach((piece, index) => {
         piece.update();
         piece.draw();
         
-        if (piece.y > canvas.height) {
+        if (piece.y > rect.height) {
           confetti.splice(index, 1);
         }
       });
@@ -151,25 +221,25 @@ const FinalReveal = () => {
     };
 
     animate();
-  }, [showConfetti]);
+  }, [showConfetti, isMobile]);
 
   return (
     <section 
       ref={sectionRef}
       className="py-32 px-6 bg-gradient-to-b from-stone-100 via-purple-50 to-pink-100 relative overflow-hidden min-h-screen"
       style={{ 
-        position: isLocked ? 'fixed' : 'relative',
-        top: isLocked ? '0' : 'auto',
-        left: isLocked ? '0' : 'auto',
-        right: isLocked ? '0' : 'auto',
-        bottom: isLocked ? '0' : 'auto',
+        position: isLocked && !isMobile ? 'fixed' : 'relative',
+        top: isLocked && !isMobile ? '0' : 'auto',
+        left: isLocked && !isMobile ? '0' : 'auto',
+        right: isLocked && !isMobile ? '0' : 'auto',
+        bottom: isLocked && !isMobile ? '0' : 'auto',
         zIndex: isLocked ? 9999 : 1
       }}
     >
-      {/* Animated background particles */}
+      {/* Animated background particles - reduced on mobile */}
       {showParticles && (
         <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+          {[...Array(isMobile ? 10 : 20)].map((_, i) => (
             <div
               key={i}
               className="absolute w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"
@@ -210,10 +280,10 @@ const FinalReveal = () => {
                 {/* 3D Shadow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl transform rotate-6 scale-105 opacity-30 blur-lg"></div>
                 
-                {/* Two images side by side */}
+                {/* Two images side by side - responsive for mobile */}
                 <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
                   {/* First image container */}
-                  <div className="relative w-96 aspect-[3/4] bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform transition-all duration-500 hover:rotate-1 animate-glow hover:scale-110">
+                  <div className="relative w-full md:w-96 aspect-[3/4] bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform transition-all duration-500 hover:rotate-1 animate-glow hover:scale-110">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-20"></div>
                     
                     {/* The first birthday image */}
@@ -247,7 +317,7 @@ const FinalReveal = () => {
                   </div>
 
                   {/* Second image container */}
-                  <div className="relative w-96 aspect-[3/4] bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform transition-all duration-500 hover:rotate-1 animate-glow hover:scale-110">
+                  <div className="relative w-full md:w-96 aspect-[3/4] bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-purple-400 to-pink-400 transform transition-all duration-500 hover:rotate-1 animate-glow hover:scale-110">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-20"></div>
                     
                     {/* The second birthday image */}
@@ -281,32 +351,36 @@ const FinalReveal = () => {
                   </div>
                 </div>
                 
-                                 {/* Floating celebration elements */}
-                 {show3DEffect && (
-                   <>
-                     <div className="absolute -top-4 -right-4 text-4xl animate-float" style={{ animationDelay: '0.5s' }}>
-                       🎂
-                     </div>
-                     <div className="absolute -top-2 -left-4 text-3xl animate-float" style={{ animationDelay: '1s' }}>
-                       🎈
-                     </div>
-                     <div className="absolute -bottom-4 left-1/4 text-3xl animate-float" style={{ animationDelay: '1.5s' }}>
-                       🎁
-                     </div>
-                     <div className="absolute -bottom-2 right-1/4 text-4xl animate-float" style={{ animationDelay: '2s' }}>
-                       ⭐
-                     </div>
-                     <div className="absolute top-1/2 -left-8 text-3xl animate-float" style={{ animationDelay: '2.5s' }}>
-                       🍰
-                     </div>
-                     <div className="absolute top-1/2 -right-8 text-3xl animate-float" style={{ animationDelay: '3s' }}>
-                       🎊
-                     </div>
-                   </>
-                 )}
+                {/* Floating celebration elements - reduced on mobile */}
+                {show3DEffect && (
+                  <>
+                    <div className="absolute -top-4 -right-4 text-4xl animate-float" style={{ animationDelay: '0.5s' }}>
+                      🎂
+                    </div>
+                    <div className="absolute -top-2 -left-4 text-3xl animate-float" style={{ animationDelay: '1s' }}>
+                      🎈
+                    </div>
+                    <div className="absolute -bottom-4 left-1/4 text-3xl animate-float" style={{ animationDelay: '1.5s' }}>
+                      🎁
+                    </div>
+                    <div className="absolute -bottom-2 right-1/4 text-4xl animate-float" style={{ animationDelay: '2s' }}>
+                      ⭐
+                    </div>
+                    {!isMobile && (
+                      <>
+                        <div className="absolute top-1/2 -left-8 text-3xl animate-float" style={{ animationDelay: '2.5s' }}>
+                          🍰
+                        </div>
+                        <div className="absolute top-1/2 -right-8 text-3xl animate-float" style={{ animationDelay: '3s' }}>
+                          🎊
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
-                    </div>
+          </div>
           
           <div className="space-y-3 max-w-lg mx-auto mt-2">
             <p className={`text-xl text-stone-700 transition-all duration-1000 ${
@@ -318,7 +392,7 @@ const FinalReveal = () => {
             <div className={`transition-all duration-1000 delay-1000 ${
               showSecondLine ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
             }`}>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent animate-shake">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent animate-shake">
                 Happy Birthday! 🎉
               </h1>
             </div>
@@ -332,10 +406,10 @@ const FinalReveal = () => {
         </div>
       </div>
 
-      {/* Floating hearts background */}
+      {/* Floating hearts background - reduced on mobile */}
       {showParticles && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(isMobile ? 8 : 15)].map((_, i) => (
             <div
               key={i}
               className="absolute text-2xl animate-float"
@@ -361,18 +435,39 @@ const FinalReveal = () => {
         </div>
       )}
 
+      {/* Mobile audio trigger button */}
+      {showSoundEffect && isMobile && !audioPlayed && !audioFailed && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+          <button
+            onClick={playAudio}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full shadow-lg animate-pulse border-2 border-white"
+          >
+            🎵 Tap to Play Music
+          </button>
+        </div>
+      )}
+
+      {/* Audio failed message */}
+      {showSoundEffect && isMobile && audioFailed && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-yellow-500 text-white px-6 py-3 rounded-full shadow-lg border-2 border-white">
+            🎵 Music available on tap!
+          </div>
+        </div>
+      )}
+
       {/* Hidden audio element for birthday sound */}
       <audio ref={audioRef} preload="auto">
         <source src="/birthday-sound.mp3" type="audio/mpeg" />
       </audio>
 
-      {/* Scroll lock overlay */}
+      {/* Scroll lock overlay - mobile-friendly */}
       {isLocked && (
         <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-pink-900 to-yellow-900 bg-opacity-90 z-50 flex items-center justify-center">
-          <div className="text-white text-center">
-            <div className="text-8xl mb-6 animate-bounce">🎉</div>
-            <h2 className="text-3xl font-bold mb-4 animate-pulse">SURPRISE INCOMING!</h2>
-            <p className="text-xl mb-4">Stay tuned for the birthday reveal...</p>
+          <div className="text-white text-center px-4">
+            <div className="text-6xl md:text-8xl mb-6 animate-bounce">🎉</div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 animate-pulse">SURPRISE INCOMING!</h2>
+            <p className="text-lg md:text-xl mb-4">Stay tuned for the birthday reveal...</p>
             <div className="flex justify-center space-x-2 mb-6">
               <div className="w-3 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
               <div className="w-3 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
@@ -381,7 +476,9 @@ const FinalReveal = () => {
             <button 
               onClick={() => {
                 setIsLocked(false);
-                document.body.style.overflow = 'auto';
+                if (!isMobile) {
+                  document.body.style.overflow = 'auto';
+                }
               }}
               className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg border border-white border-opacity-30 transition-all duration-300"
             >
